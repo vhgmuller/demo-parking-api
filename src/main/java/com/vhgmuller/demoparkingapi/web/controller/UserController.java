@@ -2,6 +2,10 @@ package com.vhgmuller.demoparkingapi.web.controller;
 
 import com.vhgmuller.demoparkingapi.entity.User;
 import com.vhgmuller.demoparkingapi.service.UserService;
+import com.vhgmuller.demoparkingapi.web.dto.UserCreateDto;
+import com.vhgmuller.demoparkingapi.web.dto.UserPasswordDto;
+import com.vhgmuller.demoparkingapi.web.dto.UserResponseDto;
+import com.vhgmuller.demoparkingapi.web.dto.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +21,26 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User user) {
-        User savedUser = userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    public ResponseEntity<UserResponseDto> create(@RequestBody UserCreateDto dto) {
+        User savedUser = userService.save(UserMapper.toUser(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toUserResponseDto(savedUser));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
         User user = userService.getById(id);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserMapper.toUserResponseDto(user));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updatePassword(@PathVariable Long id, @RequestBody User user) {
-        user = userService.setPassword(id, user.getPassword());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<Void> updatePassword(@PathVariable Long id, @RequestBody UserPasswordDto dto) {
+        userService.setPassword(id, dto.getOldPassword(), dto.getNewPassword(), dto.getConfirmPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<UserResponseDto>> getAll() {
         List<User> users = userService.getAll();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(UserMapper.toUserResponseDtoList(users));
     }
 }

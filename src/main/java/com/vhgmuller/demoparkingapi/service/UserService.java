@@ -33,9 +33,35 @@ public class UserService {
     }
 
     @Transactional
-    public User setPassword(Long id, String password) {
+    public User setPassword(Long id, String oldPassword, String newPassword, String confirmPassword) {
+        //validatePassword(newPassword, confirmPassword);
         User user = getById(id);
-        user.setPassword(password);
+        user.setPassword(newPassword);
         return user;
     }
+
+    /*private void validatePassword(String newPassword, String confirmPassword) {
+        if (!newPassword.equals(confirmPassword)) {
+            throw new RuntimeException("Confirming password doesn't match new password.");
+        }
+
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+
+        Pattern pattern = Pattern.compile(passwordPattern);
+        Matcher matcher = pattern.matcher(password);
+
+        assertTrue();
+
+        if (matcher.matches()) {
+            throw new RuntimeException("""
+                    New password doesn't follow the pattern.
+                    Passwords must follow:
+                    Have eight characters or more
+                    Include a capital letter
+                    Use at least one lowercase letter
+                    Consists of at least one digit
+                    Need to have one special symbol (i.e., @, #, $, %, etc.)
+                    Doesn’t contain space, tab, etc.""");
+        }
+    }*/
 }
