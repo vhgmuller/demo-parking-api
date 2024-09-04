@@ -1,9 +1,10 @@
 package com.vhgmuller.demoparkingapi.service;
 
-
 import com.vhgmuller.demoparkingapi.entity.User;
+import com.vhgmuller.demoparkingapi.exception.UniqueUsernameViolationException;
 import com.vhgmuller.demoparkingapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,11 @@ public class UserService {
 
     @Transactional
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw new UniqueUsernameViolationException(String.format("Username %s already in use", user.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)
