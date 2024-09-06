@@ -1,7 +1,8 @@
 package com.vhgmuller.demoparkingapi.service;
 
 import com.vhgmuller.demoparkingapi.entity.User;
-import com.vhgmuller.demoparkingapi.exception.UniqueUsernameViolationException;
+import com.vhgmuller.demoparkingapi.exception.EntityNotFoundException;
+import com.vhgmuller.demoparkingapi.exception.UniqueColumnViolationException;
 import com.vhgmuller.demoparkingapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,14 +22,14 @@ public class UserService {
         try {
             return userRepository.save(user);
         } catch (DataIntegrityViolationException ex) {
-            throw new UniqueUsernameViolationException(String.format("Username %s already in use", user.getUsername()));
+            throw new UniqueColumnViolationException(String.format("Username %s already in use", user.getUsername()));
         }
     }
 
     @Transactional(readOnly = true)
     public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("User not found.")
+                () -> new EntityNotFoundException(String.format("No user with id %s found", id))
         );
     }
 
